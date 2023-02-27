@@ -2,7 +2,9 @@ import Pkg
 include("kwargs.jl")
 kwargs = Kwargs.kwargs(; coverage=ENV["COVERAGE"],
                          force_latest_compatible_version=ENV["FORCE_LATEST_COMPATIBLE_VERSION"],
-                         julia_args=[string("--check-bounds=", ENV["CHECK_BOUNDS"])])
+                         julia_args=[string("--check-bounds=", ENV["CHECK_BOUNDS"])],
+                         test_arg=ENV["TEST_ARG"],
+                         )
 
 if parse(Bool, ENV["ANNOTATE"]) && VERSION > v"1.8pre"
     push!(LOAD_PATH, "@tests-logger-env") # access dependencies
