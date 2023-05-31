@@ -39,25 +39,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # Occasionally, there are rather large delays (> a few hours)
-    # between the time a package is registered in General and
-    # propagated to pkg.julialang.org.  We can avoid this by manually
-    # cloning ~/.julia/registries/General/ in Julia 1.5 and later.
-    # See:
-    # * https://github.com/JuliaLang/Pkg.jl/issues/2011
-    # * https://github.com/JuliaRegistries/General/issues/16777
-    # * https://github.com/JuliaPackaging/PkgServer.jl/issues/60
-    - run: julia --color=yes "$GITHUB_ACTION_PATH"/add_general_registry.jl
+    - name: Set and export registry flavor preference
+      run: echo "JULIA_PKG_SERVER_REGISTRY_PREFERENCE=${JULIA_PKG_SERVER_REGISTRY_PREFERENCE:-eager}" >> ${GITHUB_ENV}
       shell: bash
-      env:
-        # We set `JULIA_PKG_SERVER` only for this step to enforce
-        # `Pkg.Registry.add` to use Git.  This way, Pkg.jl can send
-        # the request metadata to pkg.julialang.org when installing
-        # packages via `Pkg.test`.
-        JULIA_PKG_SERVER: ""
     - name: Install dependencies in their own (shared) environment
       run: |
-        if VERSION > v"1.8pre"
+        # Functionality only currently works on a narrow range of Julia versions... see #76
+        if v"1.8pre" < VERSION < v"1.9.0-beta3"
           using Pkg
           Pkg.activate("tests-logger-env"; shared=true)
           Pkg.add(Pkg.PackageSpec(name="GitHubActions", version="0.1"))

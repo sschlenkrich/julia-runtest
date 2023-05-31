@@ -38,13 +38,15 @@ jobs:
           arch: ${{ matrix.julia-arch }}
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
-        with:
-          annotate: true
+        # with:
+        #   annotate: true
 ```
 
 You can add this workflow to your repository by placing it in a file called `test.yml` in the folder `.github/workflows/`. [More info here](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions).
 
 Here, setting `annotate: true` causes GitHub "annotations" to appear when reviewing the PR, pointing to failing tests, if any.
+This functionality is only enabled on Julia 1.8 (even if `annotate` is set to `true`), since currently it does not work on other Julia versions (see #76).
+
 By default, `annotate` is set to false, but that may change in future releases of this action.
 ### Prefixing the Julia command
 
@@ -78,3 +80,13 @@ If you only want to add this prefix on certain builds, you can [include addition
 ```
 
 This will add the prefix `xvfb-run` to all builds where the `os` is `ubuntu-latest`.
+
+
+### Registry flavor preference
+
+This actions defines (and exports for subsequent steps of the workflow) the
+environmental variable `JULIA_PKG_SERVER_REGISTRY_PREFERENCE=eager` unless it
+is already set. If you want another registry flavor (i.e. `conservative`) this
+should be defined in the `env:` section of the relevant workflow or step. See
+[Registry flavors](https://pkgdocs.julialang.org/dev/registries/#Registry-flavors)
+for more information.
