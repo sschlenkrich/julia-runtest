@@ -11,19 +11,24 @@ An example workflow that uses this action might look like this:
 ```yaml
 name: Run tests
 
-on: 
+on:
   push:
     branches:
       - master
       - main
   pull_request:
 
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        julia-version: ['1.0', '1', 'nightly']
+        julia-version: ['1.6', '1', 'nightly']
         julia-arch: [x64, x86]
         os: [ubuntu-latest, windows-latest, macOS-latest]
         exclude:
@@ -31,11 +36,12 @@ jobs:
             julia-arch: x86
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
+      - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         # with:
@@ -45,7 +51,7 @@ jobs:
 You can add this workflow to your repository by placing it in a file called `test.yml` in the folder `.github/workflows/`. [More info here](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions).
 
 Here, setting `annotate: true` causes GitHub "annotations" to appear when reviewing the PR, pointing to failing tests, if any.
-This functionality is only enabled on Julia 1.8 (even if `annotate` is set to `true`), since currently it does not work on other Julia versions (see #76).
+This functionality is only enabled on Julia 1.8 (even if `annotate` is set to `true`), since currently it does not work on other Julia versions (see [#76](https://github.com/julia-actions/julia-runtest/issues/76)).
 
 By default, `annotate` is set to false, but that may change in future releases of this action.
 ### Prefixing the Julia command
