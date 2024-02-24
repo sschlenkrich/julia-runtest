@@ -6,6 +6,7 @@ kwargs = Kwargs.kwargs(; coverage=ENV["COVERAGE"],
                                      string("--compiled-modules=", ENV["COMPILED_MODULES"])],
                          test_arg=ENV["TEST_ARG"],
                         )
+
 if parse(Bool, ENV["ANNOTATE"]) && v"1.8pre" < VERSION < v"1.9.0-beta3"
     push!(LOAD_PATH, "@tests-logger-env") # access dependencies
     using GitHubActions, Logging
